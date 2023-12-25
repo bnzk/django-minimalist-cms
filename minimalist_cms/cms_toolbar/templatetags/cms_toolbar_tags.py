@@ -4,7 +4,7 @@ from django import template
 from django.conf import settings
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from minimalist_cms.cms_toolbar import conf
 
@@ -38,8 +38,6 @@ def cms_toolbar(context):
     return context
 
 
-
-
 @register.simple_tag(takes_context=True)
 def cms_toolbar_edit_link(context, model_instance, edit_text=''):
     """
@@ -61,5 +59,30 @@ def cms_toolbar_edit_link(context, model_instance, edit_text=''):
 
     return mark_safe(
         '<a href="{}" class="minimalist-cms-edit-link">{}</a>'
+        .format(edit_link, edit_text)
+    )
+
+
+@register.simple_tag(takes_context=True)
+def cms_toolbar_new_link(context, model_instance, edit_text=''):
+    """
+    edit link, opens dialog to edit provided model (or create new, when passed a model class)
+    :return:s
+    """
+    if not context['request'].session.get('cms_toolbar_edit', None):
+        return ''
+    if not edit_text:
+        edit_text = _('Add new')
+
+    opts = model_instance._meta
+    # Django < 1.10 creates dynamic proxy model subclasses when fields are
+    # deferred using .only()/.exclude(). Make sure to use the underlying
+    # model options when it's the case.
+    if getattr(model_instance, '_deferred', False):
+        opts = opts.proxy_for_model._meta
+    edit_link = reverse('admin:%s_%s_add' % (opts.app_label, opts.model_name))
+
+    return mark_safe(
+        '<a href="{}" class="minimalist-cms-edit-link minimalist-cms-new-link">{}</a>'
         .format(edit_link, edit_text)
     )
