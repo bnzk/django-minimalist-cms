@@ -41,10 +41,14 @@ Besides adding `minimalist_cms.cms_toolbar` to installed apps, you'll need to do
 This will show the toolbar handle on the left side of the browser. If you want to add direct edit links, 
 for your objects, add something like this:
 
-    {% cms_toolbar_edit_link object_to_edit 'optional link text' %}
+    {% cms_toolbar_edit_link object_to_edit 'optional edit link text' %}
     
 This will open the toolbar iframe, with the admin change view for the `object_to_edit`. Edit links will 
 only be visible when in "Edit Mode".
+    
+    # This is the same, but for creation of new instances
+    {% cms_toolbar_new_link object_or_class_to_create_new_instance "optional create link text" %}
+
 
 #### Configure the toolbar menu
 
